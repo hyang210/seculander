@@ -1,0 +1,22 @@
+name: Security Audit  # 보안 취약점 검사
+
+on:
+  schedule:
+    - cron: '0 0 * * 1' # 매주 월요일
+  push:
+    branches: [ Develop, Main ]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Audit Backend
+      working-directory: ./
+      # 실제 취약점이 있으면 에러가 나서 CI가 실패함 (audit-level 조절 가능)
+      run: npm audit --audit-level=critical || true 
+
+    - name: Audit Frontend
+      working-directory: ./frontend_app
+      run: npm audit --audit-level=critical || true

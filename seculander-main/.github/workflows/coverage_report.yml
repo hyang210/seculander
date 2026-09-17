@@ -1,0 +1,32 @@
+name: Coverage Report # 테스트 커버리지
+
+on:
+  push:
+    branches: [ Develop ]
+    paths:
+      - 'src/**'
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    - name: Install Dependencies
+      run: npm ci
+
+    - name: Generate Coverage
+      # Jest 커버리지 옵션 실행
+      run: npm test -- --coverage --passWithNoTests
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: coverage/

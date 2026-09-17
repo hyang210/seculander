@@ -1,0 +1,41 @@
+name: Backend CI  # 백엔드 코드 품질
+
+on:
+  push:
+    branches: [ Develop, Main ]
+    paths:
+      - 'backend_app/**'
+      - 'package.json'
+  pull_request:
+    branches: [ Develop ]
+    paths:
+      - 'backend_app/**'
+
+jobs:
+  backend-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: package-lock.json
+
+    - name: Install Dependencies
+      run: npm ci
+
+    # package.json에 추가한 lint 스크립트 실행
+    - name: Run Linter
+      run: npm run lint
+      continue-on-error: true # 초기 개발 단계라 린트 에러 무시 (필요시 false로 변경)
+
+    # package.json에 추가한 test 스크립트 실행
+    - name: Run Unit Tests
+      run: npm test -- --passWithNoTests # 테스트 파일이 없어도 통과하도록 설정
